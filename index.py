@@ -10,8 +10,9 @@ def index():
 def search():
     query = request.args.get('query')
     # Perform search operation with the query
-    # You can add your search logic here
-    return f"Search results for: {query}"
+    # Replace the following line with your search logic
+    results = ['Result 1', 'Result 2', 'Result 3']
+    return render_template('index.html', results=results)
 
 if __name__ == '__main__':
     app.run()

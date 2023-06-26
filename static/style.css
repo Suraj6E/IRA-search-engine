@@ -1,8 +1,19 @@
 .container {
-    display: flex;
-    justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+.search-bar{
+
+    max-width: 60%;
+    margin: 0 auto;
+    /* position: relative; */
+    margin-top: 30vh;
+    top: 20%;
+}
+
+.results{
+    margin-top: 5vh;
 }
 
 input[type="text"] {

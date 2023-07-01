@@ -1,9 +1,12 @@
 import requests
 import time
 from bs4 import BeautifulSoup
+import csv
 
-URL = "https://pureportal.coventry.ac.uk/en/organisations/centre-for-intelligent-healthcare/publications/";
-domain = "https://pureportal.coventry.ac.uk"
+URL     = "https://pureportal.coventry.ac.uk/en/organisations/centre-for-intelligent-healthcare/publications/";
+domain  = "https://pureportal.coventry.ac.uk"
+data    = []
+
 def crawl_task(current_url):
     print("Scanning .....  "+current_url)
     response = requests.get(current_url)
@@ -12,8 +15,6 @@ def crawl_task(current_url):
     if response.status_code == 200:
         # Parse the HTML content of the page
         soup = BeautifulSoup(response.content, "html.parser")
-
-        data = []
 
         content_elements = soup.find_all(class_="list-result-item")
         for element in content_elements:
@@ -59,5 +60,21 @@ def crawl_task(current_url):
         next_page = soup.select_one("nav.pages ul li.next a");
         if next_page is not None:
             crawl_task(domain + next_page['href']);
+        else:
+            filename = 'data.csv'
+            # Extract field names from the first dictionary in the list
+            fieldnames = data[0].keys()
+
+            # Open the CSV file in write mode
+            with open(filename, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+                # Write the header row
+                writer.writeheader()
+
+                # Write the data rows
+                writer.writerows(data)
+
+            print(f"List of dictionaries saved to {filename} successfully.")
     
 crawl_task(URL)

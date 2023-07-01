@@ -1,39 +1,63 @@
-from apscheduler.schedulers.background import BackgroundScheduler
 import requests
+import time
 from bs4 import BeautifulSoup
 
-def crawl_task():
-    # Specify the URL you want to crawl
-    url = 'https://example.com'
-
-    # Send a GET request to the URL
-    response = requests.get(url)
+URL = "https://pureportal.coventry.ac.uk/en/organisations/centre-for-intelligent-healthcare/publications/";
+domain = "https://pureportal.coventry.ac.uk"
+def crawl_task(current_url):
+    print("Scanning .....  "+current_url)
+    response = requests.get(current_url)
 
     # Check if the request was successful
     if response.status_code == 200:
         # Parse the HTML content of the page
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        # Find and extract the data you need from the parsed HTML
-        # Example: Get all the links on the page
-        links = []
-        for link in soup.find_all('a'):
-            links.append(link.get('href'))
+        data = []
 
-        # Process or store the extracted data as desired
-        print(links)
+        content_elements = soup.find_all(class_="list-result-item")
+        for element in content_elements:
+            title_element = element.select_one("h3.title a.link span")
+            title = title_element.get_text(strip=True)
 
-def schedule_crawl_task():
-    # Create a scheduler instance
-    scheduler = BackgroundScheduler()
+            publication_link_element = element.select_one("h3.title a.link")
+            publication_link = publication_link_element["href"]
 
-    # Schedule the crawl_task to run every week (e.g., every Monday at 8:00 AM)
-    scheduler.add_job(crawl_task, 'cron', day_of_week='mon', hour=8, minute=0)
+            date_element = element.select_one("span.date")
+            date = date_element.get_text(strip=True)
 
-    # Start the scheduler
-    scheduler.start()
+            date_element = element.select_one("span.date")
+            date = date_element.get_text(strip=True)
 
-# Register the before_first_request function to run before the first request
-@app.before_first_request
-def setup_scheduler():
-    schedule_crawl_task()
+            rcih_authors_elements = element.select("a.link.person");
+            rcih_authors = [
+                {"name": author.text.strip(), "link": author["href"]}
+                for author in rcih_authors_elements
+            ]
+
+            # find all authors except which have links (i.e. rcih auhtors)
+            rendering_portal = element.find("div", class_="rendering_portal-short")
+            author_spans = rendering_portal.find_all("span", class_=False)
+
+            authors = [
+                {"name": author.text.strip(), "link": None}
+                for author in author_spans
+                if author.find_parent("a") is None
+            ]
+
+            data.append(
+                {
+                    "title": title,
+                    "publication_link": publication_link,
+                    "date": date,
+                    "RCIH_authors": rcih_authors,
+                    "authors": authors,
+                }
+            )
+
+        #get next URL
+        next_page = soup.select_one("nav.pages ul li.next a");
+        if next_page is not None:
+            crawl_task(domain + next_page['href']);
+    
+crawl_task(URL)

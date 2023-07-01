@@ -74,8 +74,8 @@
     </div>
 
     <div class="toast-container">
-        <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-            <div id="loadToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="position-fixed top-0 end-0 p-3 " style="z-index: 11">
+            <div id="loadToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
                     <strong class="me-auto">
                         <div class="spinner-border spinner-border-sm text-warning" role="status">
@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            <div id="errorToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" >
                 <div class="toast-header">
                     <strong class="me-auto">
                         <span class="text-danger">&#x274C; &nbsp; Error: </span>
@@ -96,13 +96,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div id="errorToastBody" class="toast-body text-danger">
+                    Unknown Error.
                 </div>
             </div>
 
-            <div id="successToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="successToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
-                        <span>&#x2705; &nbsp; Scaned Successful.</span>
+                        <span>&#x2705; &nbsp; Scaned Successfully.</span>
                     </strong>
                     <!-- <small>A week ago</small> -->
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -124,11 +125,11 @@
 
             var successToast = document.getElementById('successToast');
             var stoast = new bootstrap.Toast(successToast);
-            stoast.show();
+            
 
             var errorToast = document.getElementById('errorToast');
             var etoast = new bootstrap.Toast(errorToast);
-            etoast.show();
+            
 
 
             $.ajax({
@@ -136,9 +137,13 @@
                 type: 'POST',
                 success: function (response) {
                     console.log(response.message);
+                    ltoast.hide();
+                    stoast.show();
                 },
                 error: function (error) {
                     console.log({error});
+                    ltoast.hide();
+                    etoast.show();
                 }
             });
         });

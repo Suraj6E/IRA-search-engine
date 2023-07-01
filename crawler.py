@@ -77,4 +77,12 @@ def crawl_task(current_url):
 
             print(f"List of dictionaries saved to {filename} successfully.")
     
-crawl_task(URL)
+# crawl_task(URL)
+
+
+def test_task():
+    print("on the crawler.py page");
+    return {"error": "sample error"};
+
+test_task()
+

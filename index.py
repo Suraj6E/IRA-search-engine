@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import subprocess
 
 app = Flask(__name__)
 
@@ -6,6 +7,11 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/run_crawler', methods=['POST'])
+def run_crawler():
+    subprocess.call(['python', 'crawler.py'])
+    return jsonify({'message': 'Crawler executed successfully'})
 
 @app.route('/search', methods=['GET'])
 def search():

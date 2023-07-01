@@ -1,5 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import subprocess
+import json
+import os
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -10,8 +14,46 @@ def index():
 
 @app.route('/run_crawler', methods=['POST'])
 def run_crawler():
-    subprocess.call(['python', 'crawler.py'])
-    return jsonify({'message': 'Crawler executed successfully'})
+
+    filename = "schedule.json"
+    #open file if exist
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            data = json.load(file);
+
+            # Extract the date from the JSON data
+            json_date = datetime.strptime(data["last_scan"], "%Y-%m-%d %H:%M:%S")
+            
+            # Compare the dates
+            one_week_ago = datetime.now() - timedelta(weeks=1)
+            if json_date < one_week_ago:
+                subprocess.call(['python', 'crawler.py'])
+                with open(filename, "w") as file:
+                    json.dump(data, file)
+                
+                return jsonify({'message': 'Data is upto date.'})
+            else:
+                return jsonify({'message': "Update time limit not reached."});
+
+            subprocess.call(['python', 'crawler.py'])
+            return jsonify({'message': 'Crawler executed successfully'})
+
+            data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            
+
+    else:
+        #write and scan if file doesn't exist
+        data={
+            "last_scan": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        with open(filename, "w") as file:
+            json.dump(data, file)
+
+        subprocess.call(['python', 'crawler.py'])
+
+    return jsonify({'message': 'Data is upto date.'})
 
 @app.route('/search', methods=['GET'])
 def search():

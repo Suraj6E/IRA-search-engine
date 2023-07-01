@@ -92,11 +92,11 @@
             <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
-                        <span class="text-danger">&#x274C; &nbsp; Error: </span>
+                        <span class="text-danger" >&#x274C; &nbsp; Error: </span>
                     </strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div id="errorToastBody" class="toast-body text-danger">
+                <div id="errorToastBody" class="toast-body text-danger" id="etoastTitle">
                     Unknown Error.
                 </div>
             </div>
@@ -104,7 +104,7 @@
             <div id="successToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
-                        <span>&#x2705; &nbsp; Scaned Successfully.</span>
+                        <span>&#x2705; &nbsp;</span><span id="stoastTitle">Scaned Successfully.</span>
                     </strong>
                     <!-- <small>A week ago</small> -->
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -139,16 +139,19 @@
                         console.log(response);
                         if (response.error) throw new Error(response.error);
                         ltoast.hide();
+                        document.getElementById('stoastTitle').innerText = response?.message;
                         stoast.show();
                     } catch (error) {
                         console.log('Error:', error);
                         ltoast.hide();
+                        document.getElementById('etoastTitle').innerText = error?.statusText;
                         etoast.show();
                     }
                 },
                 error: function (error) {
                     console.log({ error });
                     ltoast.hide();
+                    document.getElementById('etoastTitle').innerText = error?.statusText;
                     etoast.show();
                 }
             });

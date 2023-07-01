@@ -11,7 +11,6 @@ def crawl_task(current_url):
     try:
         print("Scanning .....  " + current_url)
         response = requests.get(current_url)
-
         # Check if the request was successful
         if response.status_code == 200:
             # Parse the HTML content of the page
@@ -78,6 +77,6 @@ def crawl_task(current_url):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-    
+
 crawl_task(URL)
 

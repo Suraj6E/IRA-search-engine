@@ -5,6 +5,8 @@
     <title>Search Page</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 
 <body>
@@ -18,6 +20,8 @@
                 </div>
             </form>
         </div>
+
+
 
         {% if results %}
         <div class="results">
@@ -68,6 +72,82 @@
         </nav>
         {% endif %}
     </div>
+
+    <div class="toast-container">
+        <div class="position-fixed top-0 end-0 p-3 " style="z-index: 11">
+            <div id="loadToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                <div class="toast-header">
+                    <strong class="me-auto">
+                        <div class="spinner-border spinner-border-sm text-warning" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span> &nbsp; Scanning...</span>
+                    </strong>
+                    <small>A week ago</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" >
+                <div class="toast-header">
+                    <strong class="me-auto">
+                        <span class="text-danger">&#x274C; &nbsp; Error: </span>
+                    </strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div id="errorToastBody" class="toast-body text-danger">
+                    Unknown Error.
+                </div>
+            </div>
+
+            <div id="successToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">
+                        <span>&#x2705; &nbsp; Scaned Successfully.</span>
+                    </strong>
+                    <!-- <small>A week ago</small> -->
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+
+        $(document).ready(function () {
+            console.log("JQuery Loaded Successfully.");
+
+            //showing toast
+            var loadingToast = document.getElementById('loadToast');
+            var ltoast = new bootstrap.Toast(loadingToast);
+            ltoast.show();
+
+            var successToast = document.getElementById('successToast');
+            var stoast = new bootstrap.Toast(successToast);
+            
+
+            var errorToast = document.getElementById('errorToast');
+            var etoast = new bootstrap.Toast(errorToast);
+            
+
+
+            $.ajax({
+                url: '/run_crawler',
+                type: 'POST',
+                success: function (response) {
+                    console.log(response.message);
+                    ltoast.hide();
+                    stoast.show();
+                },
+                error: function (error) {
+                    console.log({error});
+                    ltoast.hide();
+                    etoast.show();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

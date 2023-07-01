@@ -75,7 +75,8 @@
 
     <div class="toast-container">
         <div class="position-fixed top-0 end-0 p-3 " style="z-index: 11">
-            <div id="loadToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div id="loadToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true"
+                data-bs-autohide="false">
                 <div class="toast-header">
                     <strong class="me-auto">
                         <div class="spinner-border spinner-border-sm text-warning" role="status">
@@ -88,7 +89,7 @@
                 </div>
             </div>
 
-            <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true" >
+            <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
                         <span class="text-danger">&#x274C; &nbsp; Error: </span>
@@ -125,23 +126,28 @@
 
             var successToast = document.getElementById('successToast');
             var stoast = new bootstrap.Toast(successToast);
-            
+
 
             var errorToast = document.getElementById('errorToast');
             var etoast = new bootstrap.Toast(errorToast);
-            
-
 
             $.ajax({
                 url: '/run_crawler',
                 type: 'POST',
                 success: function (response) {
-                    console.log({response});
-                    ltoast.hide();
-                    stoast.show();
+                    try {
+                        console.log(response);
+                        if (response.error) throw new Error(response.error);
+                        ltoast.hide();
+                        stoast.show();
+                    } catch (error) {
+                        console.log('Error:', error);
+                        ltoast.hide();
+                        etoast.show();
+                    }
                 },
                 error: function (error) {
-                    console.log({error});
+                    console.log({ error });
                     ltoast.hide();
                     etoast.show();
                 }

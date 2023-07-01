@@ -13,7 +13,7 @@ def index():
 def run_crawler():
     try:
         output = subprocess.check_output(['python', 'crawler.py'], universal_newlines=True)
-        return jsonify({'output': output})
+        return jsonify(output);
     except subprocess.CalledProcessError as e:
         print(str(e));
         return jsonify({'error': str(e)})

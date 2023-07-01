@@ -8,16 +8,10 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-#calls a subprocess throw jquery
 @app.route('/run_crawler', methods=['POST'])
 def run_crawler():
-    try:
-        output = subprocess.check_output(['python', 'crawler.py'], universal_newlines=True)
-        return jsonify(output);
-    except subprocess.CalledProcessError as e:
-        print(str(e));
-        return jsonify({'error': str(e)})
-
+    subprocess.call(['python', 'crawler.py'])
+    return jsonify({'message': 'Crawler executed successfully'})
 
 @app.route('/search', methods=['GET'])
 def search():

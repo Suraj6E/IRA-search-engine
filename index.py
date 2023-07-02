@@ -11,6 +11,8 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+
+
 @app.route('/run_crawler', methods=['POST'])
 def run_crawler():
     
@@ -62,6 +64,9 @@ def run_crawler():
         return jsonify({'message': 'Data successfully scrapped and index updated. '})
 
     return jsonify({'message': 'Data is upto date.'})
+
+
+
 
 @app.route('/search', methods=['GET'])
 def search():

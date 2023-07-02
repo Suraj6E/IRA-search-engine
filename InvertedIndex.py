@@ -3,7 +3,9 @@ import pandas as pandas;
 import re
 import nltk
 import json
+from collections import defaultdict
 
+#lemmatizer's import
 nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 
@@ -12,10 +14,7 @@ from nltk.corpus import stopwords
 
 
 
-from collections import defaultdict
-
 index_filename = 'search_indexs.json';
-
 
 #should be called after new data is arrived
 def get_df():
@@ -85,13 +84,6 @@ def create_save_indexes():
     except Exception as e:
         print(f"An error occurred on indexing: {str(e)}")
         return False;
-
-def read_indexs():
-    date = []
-    with open(index_filename, 'r') as file:
-        data = json.load(file)
-    
-    return data;
 
 
 #called from subproess

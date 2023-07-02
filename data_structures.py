@@ -43,4 +43,5 @@ df = create_index(get_df());
 print(df['title'].head());
 
 df = process_word(df);
+df.to_csv('data.csv', index=False)
 print(df['title'].head());

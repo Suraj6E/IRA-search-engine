@@ -32,16 +32,18 @@ def process_word(df):
         word = re.sub(r'\W+', ' ', word)
         word = word.lower();
         return lemmatizer.lemmatize(word)
+    
 
     df['title'] = df['title'].apply(lambda x: ' '.join([lemmatize_word(word) for word in x.split()]));
+    df['all_authors'] = df['all_authors'].apply(lambda x: ' '.join([lemmatize_word(word) for word in x.split()]));
 
     return df;
 
 
 
 df = create_index(get_df());
-print(df['title'].head());
+print(df.head());
 
 df = process_word(df);
 # df.to_csv('data.csv', index=False)
-print(df['title'].head());
+print(df.head());

@@ -31,8 +31,8 @@ def run_crawler():
             crawler = subprocess.Popen(['python', 'crawler.py'])
             crawler.wait();
             
-            data_structures = subprocess.Popen(['python', 'data_structures.py'])
-            data_structures.wait();
+            InvertedIndex = subprocess.Popen(['python', 'InvertedIndex.py'])
+            InvertedIndex.wait();
 
             data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -56,8 +56,8 @@ def run_crawler():
         crawler = subprocess.Popen(['python', 'crawler.py'])
         crawler.wait();
         
-        data_structures = subprocess.Popen(['python', 'data_structures.py'])
-        data_structures.wait();
+        InvertedIndex = subprocess.Popen(['python', 'InvertedIndex.py'])
+        InvertedIndex.wait();
 
         return jsonify({'message': 'Data successfully scrapped and index updated. '})
 

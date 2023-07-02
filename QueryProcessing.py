@@ -74,11 +74,12 @@ def get_data_from_csv(array):
 def get_relevent_score(query):
     df = filter_relevent_docs(query);
 
-    
-    return [];
+    data = df.to_dict('records')
+    return data
 
 
-print(get_relevent_score("researching health"));
+
+#print(get_relevent_score("researching health"));
 
 
 

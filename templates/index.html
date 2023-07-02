@@ -14,18 +14,17 @@
         <div class="search-bar">
             <form action="{{ url_for('search') }}" method="GET" class="mb-3">
                 <div class="input-group">
-                    <input type="text" name="query" placeholder="Search..." required class="form-control" id="searchField" disabled>
+                    <input type="text" name="query" placeholder="Search..." required class="form-control"
+                        id="searchField" disabled>
                     <input type="hidden" name="page" value="1">
                     <button type="submit" class="btn btn-primary" id="submitField" disabled>Search</button>
                 </div>
             </form>
         </div>
 
-
-
         {% if results %}
         <div class="results">
-            <h4>Search Results:</h4>
+            <h4>{{total_results}} Results found:</h4>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
@@ -40,9 +39,9 @@
                         {% for result in results %}
                         <tr>
                             <td>{{ result['title'] }}</td>
-                            <td>{{ result['author'] }}</td>
-                            <td>{{ result['date_created'] }}</td>
-                            <td>{{ result['date_updated'] }}</td>
+                            <td>{{ result['all_authors'] }}</td>
+                            <!-- <td>{{ result['date_created'] }}</td>
+                            <td>{{ result['date_updated'] }}</td> -->
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -70,6 +69,8 @@
                 {% endif %}
             </ul>
         </nav>
+        {% else %}
+        <p>No Result found.</p>
         {% endif %}
     </div>
 
@@ -92,7 +93,7 @@
             <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
-                        <span class="text-danger" >&#x274C; &nbsp; Error: </span>
+                        <span class="text-danger">&#x274C; &nbsp; Error: </span>
                     </strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
@@ -114,6 +115,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {% if query is none %}
     <script>
 
         $(document).ready(function () {
@@ -126,7 +128,6 @@
 
             var successToast = document.getElementById('successToast');
             var stoast = new bootstrap.Toast(successToast);
-
 
             var errorToast = document.getElementById('errorToast');
             var etoast = new bootstrap.Toast(errorToast);
@@ -163,6 +164,18 @@
             });
         });
     </script>
+    {% else %}
+    <script>
+        $(document).ready(function () {
+            console.log("JQuery Loaded Successfully.");
+
+            $("#searchField").prop("disabled", false);
+            $("#searchField").focus();
+            $("#submitField").prop("disabled", false);
+            
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

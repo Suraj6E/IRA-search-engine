@@ -43,6 +43,9 @@ def crawl_task(current_url):
                     if author.find_parent("a") is None
                 ]
 
+                all_authors = rcih_authors + authors;
+                all_authors = ', '.join([d['name'] for d in all_authors]);
+
                 data.append(
                     {
                         "title": title,
@@ -50,6 +53,7 @@ def crawl_task(current_url):
                         "date": date,
                         "RCIH_authors": rcih_authors,
                         "authors": authors,
+                        "all_authors": all_authors
                     }
                 )
 

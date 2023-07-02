@@ -14,9 +14,9 @@
         <div class="search-bar">
             <form action="{{ url_for('search') }}" method="GET" class="mb-3">
                 <div class="input-group">
-                    <input type="text" name="query" placeholder="Search..." required class="form-control">
+                    <input type="text" name="query" placeholder="Search..." required class="form-control" id="searchField" disabled>
                     <input type="hidden" name="page" value="1">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-primary" id="submitField" disabled>Search</button>
                 </div>
             </form>
         </div>
@@ -136,6 +136,12 @@
                 type: 'POST',
                 success: function (response) {
                     try {
+                        //enable search bar and button
+                        $("#searchField").prop("disabled", false);
+                        $("#searchField").focus();
+                        $("#submitField").prop("disabled", false);
+
+
                         console.log(response);
                         if (response.error) throw new Error(response.error);
                         ltoast.hide();

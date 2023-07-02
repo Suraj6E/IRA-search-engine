@@ -4,7 +4,6 @@ import json
 import os
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
 
 
@@ -14,33 +13,35 @@ def index():
 
 @app.route('/run_crawler', methods=['POST'])
 def run_crawler():
-
+    
     filename = "schedule.json"
     #open file if exist
     if os.path.exists(filename):
         with open(filename, "r") as file:
             data = json.load(file);
 
-            # Extract the date from the JSON data
-            json_date = datetime.strptime(data["last_scan"], "%Y-%m-%d %H:%M:%S")
-            
-            # Compare the dates
-            one_week_ago = datetime.now() - timedelta(weeks=1)
-            if json_date < one_week_ago:
-                subprocess.call(['python', 'crawler.py'])
-                with open(filename, "w") as file:
-                    json.dump(data, file)
-                
-                return jsonify({'message': 'Data is upto date.'})
-            else:
-                return jsonify({'message': "Update time limit not reached."});
+        # Extract the date from the JSON data
+        json_date = datetime.strptime(data["last_scan"], "%Y-%m-%d %H:%M:%S")
+        
+        # Compare the dates
+        one_week_ago = datetime.now() - timedelta(weeks=1)
+        if json_date < one_week_ago:
 
-            subprocess.call(['python', 'crawler.py'])
-            return jsonify({'message': 'Crawler executed successfully'})
+            #run crawler, wait and run data_strucutres for indexing
+            crawler = subprocess.Popen(['python', 'crawler.py'])
+            crawler.wait();
+            
+            data_structures = subprocess.Popen(['python', 'data_structures.py'])
+            data_structures.wait();
 
             data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+            with open(filename, "w") as file:
+                json.dump(data, file);
             
+            return jsonify({'message': 'Data successfully scrapped and index updated. '})
+        else:
+            return jsonify({'message': "Update time limit not reached."});
 
     else:
         #write and scan if file doesn't exist
@@ -51,7 +52,14 @@ def run_crawler():
         with open(filename, "w") as file:
             json.dump(data, file)
 
-        subprocess.call(['python', 'crawler.py'])
+        #run crawler, wait and run data_strucutres for indexing
+        crawler = subprocess.Popen(['python', 'crawler.py'])
+        crawler.wait();
+        
+        data_structures = subprocess.Popen(['python', 'data_structures.py'])
+        data_structures.wait();
+
+        return jsonify({'message': 'Data successfully scrapped and index updated. '})
 
     return jsonify({'message': 'Data is upto date.'})
 

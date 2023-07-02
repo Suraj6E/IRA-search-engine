@@ -67,13 +67,16 @@ def create_indexes(df):
 
 
 #utilized everything on this file
-def create_save_indexs():
+def create_save_indexes():
     try: 
         df = add_index_col(get_df());
+        print("Processing words.");
         df = process_word(df);
+        
+        print("Creating Indexes.");
         indexes = create_indexes(df);
 
-        print(indexes);
+        print("Indexing finished successfully.");
         #save indexes
         with open(index_filename, 'w') as new_f:
             json.dump(indexes, new_f, sort_keys=True, indent=4)
@@ -91,6 +94,7 @@ def read_indexs():
     return data;
 
 
-create_save_indexs();
+#called from subproess
+create_save_indexes();
 
 #single_value = df.loc[0:1].copy();

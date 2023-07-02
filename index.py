@@ -4,9 +4,6 @@ import json
 import os
 from datetime import datetime, timedelta
 
-from data_structures import get_data_size;
-
-
 app = Flask(__name__)
 
 
@@ -30,15 +27,19 @@ def run_crawler():
         one_week_ago = datetime.now() - timedelta(weeks=1)
         if json_date < one_week_ago:
 
-            #run crawler and update last_scan time
-            subprocess.call(['python', 'crawler.py'])
+            #run crawler, wait and run data_strucutres for indexing
+            crawler = subprocess.Popen(['python', 'crawler.py'])
+            crawler.wait();
+            
+            data_structures = subprocess.Popen(['python', 'data_structures.py'])
+            data_structures.wait();
+
             data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             with open(filename, "w") as file:
                 json.dump(data, file);
             
-            data_size = get_data_size();
-            return jsonify({'message': str(data_size) + ' data scrapped. '})
+            return jsonify({'message': 'Data successfully scrapped and index updated. '})
         else:
             return jsonify({'message': "Update time limit not reached."});
 
@@ -51,9 +52,14 @@ def run_crawler():
         with open(filename, "w") as file:
             json.dump(data, file)
 
-        subprocess.call(['python', 'crawler.py']);
-        data_size = get_data_size();
-        return jsonify({'message': str(data_size) + ' data scrapped. '})
+        #run crawler, wait and run data_strucutres for indexing
+        crawler = subprocess.Popen(['python', 'crawler.py'])
+        crawler.wait();
+        
+        data_structures = subprocess.Popen(['python', 'data_structures.py'])
+        data_structures.wait();
+
+        return jsonify({'message': 'Data successfully scrapped and index updated. '})
 
     return jsonify({'message': 'Data is upto date.'})
 

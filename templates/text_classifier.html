@@ -31,11 +31,11 @@
             </div>
         </nav>
         <div class="processor">
-            <form method="post" action="/text_classifier">
+            <form action="/text_classifier" method="POST">
                 <div class="mb-3">
                     <label for="text" class="form-label">Enter your text:</label>
                     <textarea class="form-control" id="text" name="text" rows="5"
-                        placeholder="Enter your text here..."></textarea>
+                        placeholder="Enter your text here...">{{ text }}</textarea>
                 </div>
                 <div class="process_button">
                     <button type="submit" class="btn btn-primary float-end">Process</button>

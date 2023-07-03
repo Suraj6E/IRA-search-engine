@@ -191,6 +191,3 @@ def get_classification(input_text):
     CLASSYfier.predict_proba([input_text]);
     print(CLASSYfier.predict([input_text]))
     return CLASSYfier.predict([input_text])[0];
-
-
-get_classification("Raising equity capital via Private Investments in Public Equity (PIPEs) has been rising in popularity, matching Seasoned Equity Offerings (SEOs). We use over 10,000 PIPEs in a global setting during 1995–2015 to assess how and through which channels institutional frameworks affect the issuers' performance. We document a significant decline in the market reaction, especially during 2004–2015 and find that firms issuing equity via PIPEs have significantly worse fundamentals. We also show that country governance matters as issuing firms operating in countries with better regulatory environments outperform others. Finally, we find that regulatory enforcement is a plausible underlying channel for the positive effect of the institutional frameworks on PIPEs performance.");

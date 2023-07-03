@@ -7,13 +7,29 @@
 
     max-width: 60%;
     margin: 0 auto;
-    /* position: relative; */
-    margin-top: 30vh;
-    top: 20%;
+    position: relative;
+    /* margin-top: 20vh; */
+    top: 15%;
 }
 
 .results{
-    margin-top: 5vh;
+    margin-top: 20vh;
+}
+
+.processor{
+
+    max-width: 90%;
+    margin: 0 auto;
+    position: relative;
+    /* margin-top: 20vh; */
+    top: 10%;
+}
+.process_button{
+    width: 100%;
+}
+
+.processor_results{
+    margin-top: 20vh;
 }
 
 input[type="text"] {

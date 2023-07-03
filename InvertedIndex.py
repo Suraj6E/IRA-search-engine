@@ -1,9 +1,12 @@
 #create indexes 
 import pandas as pandas;
 import re
-import nltk
-import json
 
+import json
+from collections import defaultdict
+
+#lemmatizer's import
+import nltk
 nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 
@@ -12,24 +15,22 @@ from nltk.corpus import stopwords
 
 
 
-from collections import defaultdict
-
 index_filename = 'search_indexs.json';
-
+csv_filename = 'data.csv'
 
 #should be called after new data is arrived
 def get_df():
-    return pandas.read_csv('data.csv');
+    return pandas.read_csv(csv_filename);
 
 def get_data_size():
-    df = pandas.read_csv('data.csv');
+    df = pandas.read_csv(csv_filename);
     return df.size;
 
 
 def add_index_col(df):
     if 'id' not in df.columns:
         df.insert(0, 'id', df.reset_index().index)
-        df.to_csv('data.csv', index=False);
+        df.to_csv(csv_filename, index=False);
     return df;
 
 def process_word(df):
@@ -85,13 +86,6 @@ def create_save_indexes():
     except Exception as e:
         print(f"An error occurred on indexing: {str(e)}")
         return False;
-
-def read_indexs():
-    date = []
-    with open(index_filename, 'r') as file:
-        data = json.load(file)
-    
-    return data;
 
 
 #called from subproess

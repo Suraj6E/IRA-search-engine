@@ -11,66 +11,115 @@
 
 <body>
     <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Search</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/text_classifier">Text classification</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <div class="search-bar">
             <form action="{{ url_for('search') }}" method="GET" class="mb-3">
                 <div class="input-group">
-                    <input type="text" name="query" placeholder="Search..." required class="form-control" id="searchField" disabled>
+                    <input type="text" name="query" placeholder="Search..." required class="form-control"
+                        id="searchField" disabled>
                     <input type="hidden" name="page" value="1">
                     <button type="submit" class="btn btn-primary" id="submitField" disabled>Search</button>
                 </div>
             </form>
         </div>
 
-
-
-        {% if results %}
         <div class="results">
-            <h4>Search Results:</h4>
+
+            {% if query|length > 0 %}
+            <h5>{{total_results}} Results found for: <b>{{query}}</b></h5>
+            {% endif %}
+
+            {% if results %}
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Author</th>
-                            <th>Date Created</th>
-                            <th>Date Updated</th>
+                            <th>Authors</th>
+                            <th>Published</th>
+                            <th>Relevence</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in results %}
                         <tr>
-                            <td>{{ result['title'] }}</td>
-                            <td>{{ result['author'] }}</td>
-                            <td>{{ result['date_created'] }}</td>
-                            <td>{{ result['date_updated'] }}</td>
+                            <td class="fs-6">
+                                <a target="_blank" href={{ result['publication_link'] }}>{{ result['title'] }}</a>
+                            </td>
+                            <td class="fs-6 ">
+                                {% for author in result['RCIH_authors'] %}
+                                <span>
+                                    <a target="_blank" href={{ author['link'] }}>{{ author['name'] }}</a>,&nbsp;
+                                </span>
+                                {% endfor %}
+
+                                {% for author in result['authors'] %}
+                                <span>
+                                    {{ author['name'] }} {% if not loop.last %},&nbsp;{% endif %}
+                                </span>
+                                {% endfor %}
+                            </td>
+                            <td class="fs-6 fw-light">{{ result['date'] }}</td>
+                            <td class="fs-6 ">{{ result['relevent_score'] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if prev_page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', query=query, page=prev_page) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in page_nums %}
+
+                    <li class="page-item{% if page_num == current_page %} active{% endif %}">
+                        {% if page_num < (current_page + 10) %} <a class="page-link"
+                            href="{{ url_for('search', query=query, page=(page_num)) }}">{{ page_num
+                            }}</a>
+                            {% endif %}
+
+                            {% if page_num == (current_page + 11) %}
+                            <a class="page-link" href="#">...</a>
+                            {% endif %}
+
+                            {% if current_page > (10 * page_num) %}
+                            {% set page_num = (10 * page_num) %}
+                            {% endif %}
+                    </li>
+                    {% endfor %}
+
+                    {% if next_page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', query=query, page=next_page) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
-        <nav>
-            <ul class="pagination justify-content-center">
-                {% if prev_page %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('search', query=query, page=prev_page) }}">Previous</a>
-                </li>
-                {% endif %}
-
-                {% for page_num in page_nums %}
-                <li class="page-item{% if page_num == current_page %} active{% endif %}">
-                    <a class="page-link" href="{{ url_for('search', query=query, page=page_num) }}">{{ page_num }}</a>
-                </li>
-                {% endfor %}
-
-                {% if next_page %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('search', query=query, page=next_page) }}">Next</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
     </div>
 
     <div class="toast-container">
@@ -92,7 +141,7 @@
             <div id="errorToast" class="toast hide mt-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="me-auto">
-                        <span class="text-danger" >&#x274C; &nbsp; Error: </span>
+                        <span class="text-danger">&#x274C; &nbsp; Error: </span>
                     </strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
@@ -114,10 +163,12 @@
     </div>
 
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {% if query|length == 0 and results|length == 0 %}
     <script>
 
         $(document).ready(function () {
             console.log("JQuery Loaded Successfully.");
+
 
             //showing toast
             var loadingToast = document.getElementById('loadToast');
@@ -126,7 +177,6 @@
 
             var successToast = document.getElementById('successToast');
             var stoast = new bootstrap.Toast(successToast);
-
 
             var errorToast = document.getElementById('errorToast');
             var etoast = new bootstrap.Toast(errorToast);
@@ -163,6 +213,18 @@
             });
         });
     </script>
+    {% else %}
+    <script>
+        $(document).ready(function () {
+            console.log("JQuery Loaded Successfully.");
+
+            $("#searchField").prop("disabled", false);
+            $("#searchField").focus();
+            $("#submitField").prop("disabled", false);
+
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

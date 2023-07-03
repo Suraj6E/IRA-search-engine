@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('search.html')
 
 
 
@@ -68,7 +68,6 @@ def run_crawler():
 
 
 
-
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
@@ -90,9 +89,17 @@ def search():
         item['RCIH_authors'] = ast.literal_eval(item['RCIH_authors'])
         item['authors'] = ast.literal_eval(item['authors'])
 
-    return render_template('index.html', results = paginated_results, total_results = total_results, query = query, page=page, prev_page=page - 1,
+    return render_template('search.html', results = paginated_results, total_results = total_results, query = query, page=page, prev_page=page - 1,
                            next_page=page + 1 if page < num_pages else None,
                            page_nums=range(1, num_pages + 1), current_page=page)
+
+@app.route('/text_classifier', methods=['POST'])
+def text_classifier():
+    
+    text = request.form.get('text')
+
+
+    return render_template('text_classifier.html', text, results)
 
 if __name__ == '__main__':
     app.run()

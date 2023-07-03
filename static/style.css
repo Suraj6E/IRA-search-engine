@@ -16,6 +16,22 @@
     margin-top: 20vh;
 }
 
+.processor{
+
+    max-width: 90%;
+    margin: 0 auto;
+    position: relative;
+    /* margin-top: 20vh; */
+    top: 10%;
+}
+.process_button{
+    width: 100%;
+}
+
+.processor_results{
+    margin-top: 20vh;
+}
+
 input[type="text"] {
     padding: 10px;
     width: 300px;

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import subprocess
 import json
 import os
+import ast
 from datetime import datetime, timedelta
 from QueryProcessing import get_relevent_score
 app = Flask(__name__)
@@ -81,6 +82,13 @@ def search():
     start_index = (page - 1) * per_page
     end_index = start_index + per_page
     paginated_results = results[start_index:end_index]
+
+    print(paginated_results);
+
+    #evaluate data for rendering in jinja2
+    for item in paginated_results:
+        item['RCIH_authors'] = ast.literal_eval(item['RCIH_authors'])
+        item['authors'] = ast.literal_eval(item['authors'])
 
     return render_template('index.html', results = paginated_results, total_results = total_results, query = query, page=page, prev_page=page - 1,
                            next_page=page + 1 if page < num_pages else None,

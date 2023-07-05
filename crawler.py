@@ -58,9 +58,10 @@ def crawl_task(current_url):
                 )
 
             # Get next URL
-            next_page = soup.select_one("nav.pages ul li.next a")
-            if next_page is not None:
-                crawl_task(domain + next_page["href"])
+            next_page = soup.select_one("nav.pages ul li.next a");
+            next_page_url = domain + next_page["href"]
+            if next_page is not None and next_page_url != current_url:
+                crawl_task(next_page_url)
             else:
                 filename = "data.csv"
                 # Extract field names from the first dictionary in the list

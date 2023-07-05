@@ -85,6 +85,6 @@ def get_relevent_score(query):
 
     #sort by relevent score
     df = df.sort_values('relevent_score', ascending=False)
-    
+
     data = df.to_dict('records')
     return data

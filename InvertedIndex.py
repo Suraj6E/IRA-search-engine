@@ -27,8 +27,7 @@ def process_word(df):
    
     df['title'] = df['title'].apply(lambda x: lemmatize_text(x));
     df['all_authors'] = df['all_authors'].apply(lambda x: lemmatize_text(x));
-
-    print(df.head())
+    
     return df;
 
 def create_indexes(df):

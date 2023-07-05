@@ -79,8 +79,6 @@ def search():
     end_index = start_index + per_page
     paginated_results = results[start_index:end_index]
 
-    print(paginated_results)
-
     # evaluate data for rendering in jinja2
     for item in paginated_results:
         item["RCIH_authors"] = ast.literal_eval(item["RCIH_authors"])

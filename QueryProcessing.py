@@ -4,10 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pandas;
 
-import nltk
-nltk.download('wordnet')
-from nltk.stem import WordNetLemmatizer
-
+from Common import lemmatize_text
 
 
 
@@ -30,14 +27,10 @@ def read_inverse_indexs():
 
 def filter_relevent_docs(query):
     inverse_index = read_inverse_indexs();
+    query = lemmatize_text(query);
 
-    lemmatizer = WordNetLemmatizer()
-
-    def lemmatize_word(word):
-        word = word.lower();
-        return lemmatizer.lemmatize(word)
-
-    filtered_data = [inverse_index.get(lemmatize_word(word)) for word in query.split()]
+    #get filtered data
+    filtered_data = [inverse_index.get(word) for word in query.split()]
 
     #get filtered data as document
     combined_array = []
@@ -46,6 +39,7 @@ def filter_relevent_docs(query):
         combined_array = combined_array + item;
 
     combined_array = np.array(list(set(combined_array)))
+
     # # Extract the sets of values
     # value_sets = value_sets = [set(dictionary[key]) for dictionary in filtered_data for key in dictionary if dictionary[key] is not None]
 

@@ -9,17 +9,17 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
 
-def lemmatize_sentance(sentance):
-    sentance = sentance.lower();
-    # Remove extra symbols from the sentance
-    sentance = re.sub(r'\W+', ' ', sentance);
-    # Remove digits from the sentance
-    sentance = re.sub(r'\d+', '', sentance)
+def lemmatize_text(input_text):
+    input_text = input_text.lower();
+    # Remove extra symbols from the input text
+    input_text = re.sub(r'\W+', ' ', input_text);
+    # Remove digits from the input text
+    input_text = re.sub(r'\d+', '', input_text)
 
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english'))
-    tokens = nltk.word_tokenize(sentance)
-    lemmatized_tokens = []
+    tokens = nltk.word_tokenize(input_text)
+    output_text = []
     
     for token, tag in pos_tag(tokens):
         if token.lower() not in stop_words and token.isalpha():
@@ -29,9 +29,9 @@ def lemmatize_sentance(sentance):
             else:
                 lemmatized_token = lemmatizer.lemmatize(token)
             
-            lemmatized_tokens.append(lemmatized_token)
+            output_text.append(lemmatized_token)
     
-    return lemmatized_tokens
+    return " ".join(output_text);
 
 def get_wordnet_pos(tag):
     if tag.startswith('J'):

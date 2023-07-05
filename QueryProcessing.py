@@ -72,12 +72,15 @@ def get_relevent_score(query):
     #default value for relevent score
     df['relevent_score'] = 0
 
-    # Convert documents to numerical representation using TF-IDF
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(df['title']+ ' '+df['all_authors'])
+    try:
+        # Convert documents to numerical representation using TF-IDF
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = vectorizer.fit_transform(df['title']+ ' '+df['all_authors'])
 
-    # Compute relevance scores using cosine similarity
-    cosine_similarities = cosine_similarity(tfidf_matrix[0], tfidf_matrix).flatten()
+        # Compute relevance scores using cosine similarity
+        cosine_similarities = cosine_similarity(tfidf_matrix[0], tfidf_matrix).flatten()
+    except ValueError as e:
+        return [];
 
     #update relevent score in df
     df['relevent_score'] = cosine_similarities

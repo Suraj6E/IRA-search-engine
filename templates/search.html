@@ -78,7 +78,7 @@
                                 {% endfor %}
                             </td>
                             <td class="fs-6 fw-light">{{ result['date'] }}</td>
-                            <td class="fs-6 ">{{ result['relevent_score'] }}</td>
+                            <td class="fs-6 ">{{ result['relevent_score']| float | round(2) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

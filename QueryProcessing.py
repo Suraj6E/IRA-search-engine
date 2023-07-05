@@ -1,14 +1,11 @@
 import json
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pandas;
+from Common import lemmatize_text
 
-import nltk
-nltk.download('wordnet')
-from nltk.stem import WordNetLemmatizer
-
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfTransformer
 
 
 
@@ -30,14 +27,10 @@ def read_inverse_indexs():
 
 def filter_relevent_docs(query):
     inverse_index = read_inverse_indexs();
+    query = lemmatize_text(query);
 
-    lemmatizer = WordNetLemmatizer()
-
-    def lemmatize_word(word):
-        word = word.lower();
-        return lemmatizer.lemmatize(word)
-
-    filtered_data = [inverse_index.get(lemmatize_word(word)) for word in query.split()]
+    #get filtered data
+    filtered_data = [inverse_index.get(word) for word in query.split()]
 
     #get filtered data as document
     combined_array = []
@@ -46,6 +39,7 @@ def filter_relevent_docs(query):
         combined_array = combined_array + item;
 
     combined_array = np.array(list(set(combined_array)))
+
     # # Extract the sets of values
     # value_sets = value_sets = [set(dictionary[key]) for dictionary in filtered_data for key in dictionary if dictionary[key] is not None]
 
@@ -72,47 +66,25 @@ def get_data_from_csv(array):
 
 
 def get_relevent_score(query):
+
     df = filter_relevent_docs(query);
 
+    #default value for relevent score
+    df['relevent_score'] = 0
+
+    # Convert documents to numerical representation using TF-IDF
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(df['title']+ ' '+df['all_authors'])
+
+    # Compute relevance scores using cosine similarity
+    cosine_similarities = cosine_similarity(tfidf_matrix[0], tfidf_matrix).flatten()
+
+    #update relevent score in df
+    df['relevent_score'] = cosine_similarities
+    df.reset_index(drop=True, inplace=True)
+
+    #sort by relevent score
+    df = df.sort_values('relevent_score', ascending=False)
+    
     data = df.to_dict('records')
     return data
-
-
-
-#print(get_relevent_score("researching health"));
-
-
-
-# # Document Collection
-# documents = [
-#     "I like to play soccer.",
-#     "I enjoy watching movies.",
-#     "I like playing soccer and watching movies."
-# ]
-
-# # Create the TF-IDF vectorizer
-# vectorizer = TfidfVectorizer()
-# tfidf_matrix = vectorizer.fit_transform(documents)
-
-# # User Query
-# user_query = "play soccer"
-
-# # Vectorize the query
-# query_vector = vectorizer.transform([user_query])
-
-# # Get relevant document indices from inverted index
-# relevant_doc_ids = set()
-# for term in user_query.split():
-#     if term in inverted_index:
-#         relevant_doc_ids.update(inverted_index[term])
-
-# # Calculate cosine similarity between query and relevant documents
-# cosine_similarities = cosine_similarity(query_vector, tfidf_matrix[relevant_doc_ids]).flatten()
-
-# # Map sorted indices back to original document indices
-# sorted_indices = np.argsort(cosine_similarities)[::-1]
-
-# # Print the search results
-# for index in sorted_indices:
-#     original_index = relevant_doc_ids[index]
-#     print(f"Document {original_index + 1}: {documents[original_index]} (Similarity: {cosine_similarities[index]})")

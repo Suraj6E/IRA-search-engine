@@ -1,18 +1,8 @@
 #create indexes 
 import pandas as pandas;
-import re
-
 import json
 from collections import defaultdict
-
-#lemmatizer's import
-import nltk
-nltk.download('wordnet')
-from nltk.stem import WordNetLemmatizer
-
-nltk.download('stopwords')
-from nltk.corpus import stopwords
-
+from Common import lemmatize_text
 
 
 index_filename = 'search_indexs.json';
@@ -34,26 +24,10 @@ def add_index_col(df):
     return df;
 
 def process_word(df):
-    lemmatizer = WordNetLemmatizer()
-
-    # Remove non-alphanumeric characters and make words lowercase for each words
-    def lemmatize_word(word):
-
-        #collection of stopwords
-        stop_words = set(stopwords.words('english'))
-        
-        word = word.lower();
-
-        #filter stop words
-        if(word in stop_words): return '';
-
-        word = re.sub(r'\W+', ' ', word)
-        return lemmatizer.lemmatize(word)
-
-
-    df['title'] = df['title'].apply(lambda x: ' '.join([lemmatize_word(word) for word in x.split()]));
-    df['all_authors'] = df['all_authors'].apply(lambda x: ' '.join([lemmatize_word(word) for word in x.split()]));
-
+   
+    df['title'] = df['title'].apply(lambda x: lemmatize_text(x));
+    df['all_authors'] = df['all_authors'].apply(lambda x: lemmatize_text(x));
+    
     return df;
 
 def create_indexes(df):

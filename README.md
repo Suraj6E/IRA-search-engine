@@ -17,7 +17,7 @@ git clone https://github.com/Suraj6E/IRA-search-engine
 ```
 Go to the repository:
 ```
-cd flask-project
+cd IRA-search-engine
 ```
 Install Required Files
 ```

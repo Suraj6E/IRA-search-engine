@@ -32,6 +32,11 @@
     margin-top: 10vh;
 }
 
+.classification_img{
+    margin: 0 auto;
+    text-align: center;
+}
+
 input[type="text"] {
     padding: 10px;
     width: 300px;

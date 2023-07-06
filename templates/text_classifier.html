@@ -45,7 +45,7 @@
             <div class="processor_results">
                 <h5>Predicted Category:  <span class="badge bg-primary">{{results['predicted_category']|capitalize  }}</span></h5>
                 <h5>Predicted Probabilities: </h5>
-                <p><img alt="static/classification.png" src="{{ url_for('static', filename='classification.png') }}"/>
+                <p class="classification_img"><img alt="static/classification.png" src="{{ url_for('static', filename='classification.png') }}"/>
             </div>
             {%endif%}
         </div>

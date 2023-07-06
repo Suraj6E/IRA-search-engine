@@ -5,7 +5,7 @@ import os
 import ast
 from datetime import datetime, timedelta
 from QueryProcessing import get_relevent_score
-from TextClassification import get_classification
+from TextClassification import naive_bayes_classification
 app = Flask(__name__)
 
 
@@ -101,7 +101,7 @@ def search():
 def text_classifier_method():
     if request.method == "POST":
         text = request.form.get("text")
-        results = get_classification(text)
+        results = naive_bayes_classification(text)
         return render_template("text_classifier.html", text=text, results=results)
 
     return render_template("text_classifier.html")

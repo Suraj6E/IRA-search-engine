@@ -4,12 +4,14 @@ import pandas as pandas;
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 
 
 
 filename = "articles.csv"
+chart_path = 'static/classification.png'
 
 
 def read_csv():
@@ -29,6 +31,7 @@ def naive_bayes_classification(query_text):
 
     categories = df['category']
     articles = df['article_temp']
+
     # Create a TF-IDF vectorizer
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(articles)
@@ -46,18 +49,16 @@ def naive_bayes_classification(query_text):
     # Get the predicted label scores
     categories_scores = dict(zip(naive_bayes.classes_, predicted_probabilities))
 
-    print(categories_scores)
-
     # Predict the label for the new document
-    predicted_label = naive_bayes.predict(query_text_tfidf)
+    predicted_category = naive_bayes.predict(query_text_tfidf)
 
-    # Print predicted label
-    print("Predicted Label:", predicted_label);
-
+    #createn a pie chart for UI
     create_save_chart(naive_bayes, predicted_probabilities);
 
     return {
-
+        "predicted_category": predicted_category[0],
+        "img": chart_path,
+        "predicted_probabilities": predicted_probabilities,
     }
 
 
@@ -73,7 +74,6 @@ def create_save_chart(naive_bayes, predicted_probabilities):
     #plt.show()
 
     # Save the pie chart to a file
-    chart_path = 'static/classification.png'
     plt.savefig(chart_path)
 
-naive_bayes_classification("More work is needed to understand why the rise is happening, they say. Some of the rise could be attributed to catch-up - from backlogs and delays when health services were shut - but does not explain all of the newly diagnosed cases, say scientists.");
+#naive_bayes_classification("More work is needed to understand why the rise is happening, they say. Some of the rise could be attributed to catch-up - from backlogs and delays when health services were shut - but does not explain all of the newly diagnosed cases, say scientists.");

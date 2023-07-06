@@ -3,9 +3,10 @@ import subprocess
 import json
 import os
 import ast
+import time
 from datetime import datetime, timedelta
 from QueryProcessing import get_relevent_score
-from TextClassification import get_classification
+from TextClassification import naive_bayes_classification
 app = Flask(__name__)
 
 
@@ -28,6 +29,15 @@ def run_crawler():
         # Compare the dates
         one_week_ago = datetime.now() - timedelta(weeks=1)
         if json_date < one_week_ago:
+
+            #update scan time at first so that another scan doesn't happen at same time
+            data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(filename, "w") as file:
+                json.dump(data, file)
+
+            #for calculating execution time
+            start_time = time.time()
+
             # run crawler, wait and run data_strucutres for indexing
             crawler = subprocess.Popen(["python", "crawler.py"])
             crawler.wait()
@@ -35,13 +45,14 @@ def run_crawler():
             InvertedIndex = subprocess.Popen(["python", "InvertedIndex.py"])
             InvertedIndex.wait()
 
-            data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            end_time = time.time()
 
-            with open(filename, "w") as file:
-                json.dump(data, file)
+            execution_time = end_time - start_time
+            execution_time_formatted = "{:.2f}".format(execution_time)
 
+            
             return jsonify(
-                {"message": "Data successfully scrapped and index updated. "}
+                {"message": "Data successfully scrapped and index updated in "+execution_time_formatted+"s"}
             )
         else:
             return jsonify({"message": "Update time limit not reached."})
@@ -53,6 +64,7 @@ def run_crawler():
         with open(filename, "w") as file:
             json.dump(data, file)
 
+        start_time = time.time()
         # run crawler, wait and run data_strucutres for indexing
         crawler = subprocess.Popen(["python", "crawler.py"])
         crawler.wait()
@@ -60,7 +72,12 @@ def run_crawler():
         InvertedIndex = subprocess.Popen(["python", "InvertedIndex.py"])
         InvertedIndex.wait()
 
-        return jsonify({"message": "Data successfully scrapped and index updated. "})
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+        execution_time_formatted = "{:.2f}".format(execution_time)
+
+        return jsonify({"message": "Data successfully scrapped and index updated in "+execution_time_formatted+"s"})
 
     return jsonify({"message": "Data is upto date."})
 
@@ -72,7 +89,14 @@ def search():
     per_page = 5  # Number of results to display per page
 
     # Perform search operation with the query
+    start_time = time.time()
     results = get_relevent_score(query)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    execution_time_formatted = "{:.2f}".format(execution_time)
+
+
     total_results = len(results)
     num_pages = (total_results + per_page - 1) // per_page
     start_index = (page - 1) * per_page
@@ -94,6 +118,7 @@ def search():
         next_page=page + 1 if page < num_pages else None,
         page_nums=range(1, num_pages + 1),
         current_page=page,
+        time = execution_time_formatted
     )
 
 
@@ -101,8 +126,15 @@ def search():
 def text_classifier_method():
     if request.method == "POST":
         text = request.form.get("text")
-        results = get_classification(text)
-        return render_template("text_classifier.html", text=text, results=results)
+        
+        start_time = time.time()
+        results = naive_bayes_classification(text)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        execution_time_formatted = "{:.2f}".format(execution_time)
+        
+        return render_template("text_classifier.html", text=text, results=results, time = execution_time_formatted)
 
     return render_template("text_classifier.html")
 

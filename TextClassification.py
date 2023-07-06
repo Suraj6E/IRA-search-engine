@@ -1,193 +1,82 @@
-import os
-import string
-
-# Data Handling and Processing
-import pandas as pd
-import numpy as np
-import re
-from scipy import interp
-
-# NLP Packages
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords, wordnet
-from nltk.stem import WordNetLemmatizer
-from nltk import pos_tag
-import nltk
-
-nltk.download("punkt")
-nltk.download("averaged_perceptron_tagger")
-
-from joblib import dump, load
+from Common import lemmatize_text
+import pandas as pandas;
 
 
-# ML Models
-from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import RidgeClassifier
-from sklearn.tree import DecisionTreeClassifier
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
 
-# Scikit Learn packages
-from sklearn.base import clone
-from sklearn.preprocessing import label_binarize, LabelEncoder
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.model_selection import (
-    KFold,
-    cross_validate,
-    cross_val_score,
-    train_test_split,
-)
-from sklearn.pipeline import Pipeline
-from sklearn import metrics
-from sklearn.metrics import roc_curve, auc
+
 
 filename = "articles.csv"
+chart_path = 'static/classification.png'
 
 
 def read_csv():
-    return pd.read_csv(filename)
-
+    return pandas.read_csv(filename)
 
 def preprocess(df):
-    # check for missing value
-    df.isna().sum()
-
     # Remove special characters
-    df["article_temp"] = df["article"].replace("\n", " ")
-    df["article_temp"] = df["article_temp"].replace("\r", " ")
-
-    # Remove punctuation signs and lowercase all
-    df["article_temp"] = df["article_temp"].str.lower()
-    df["article_temp"] = df["article_temp"].str.translate(
-        str.maketrans("", "", string.punctuation)
-    )
-
-    # Remove stop words
-    stop_words = stopwords.words("english")
-    lemmatizer = WordNetLemmatizer()
-
-    def fwpt(each):
-        tag = pos_tag([each])[0][1][0].upper()
-        hash_tag = {
-            "N": wordnet.NOUN,
-            "R": wordnet.ADV,
-            "V": wordnet.VERB,
-            "J": wordnet.ADJ,
-        }
-        return hash_tag.get(tag, wordnet.NOUN)
-
-    def lematize(text):
-        tokens = nltk.word_tokenize(text)
-        ax = ""
-        for each in tokens:
-            if each not in stop_words:
-                ax += lemmatizer.lemmatize(each, fwpt(each)) + " "
-        return ax
-
-    df["article_temp"] = df["article_temp"].apply(lematize)
-
+    df["article_temp"] = df["article"].replace("\n", " ");
+    df["article_temp"] = df["article_temp"].replace("\r", " ");
+    df['article_temp'] = df['article_temp'].apply(lambda x: lemmatize_text(x));
     return df;
 
-
-def get_classification(input_text):
-
+def naive_bayes_classification(query_text):
+    
     df = read_csv();
     df = preprocess(df);
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        df["article_temp"], df["category"], test_size=0.2, random_state=9
-    )
+    categories = df['category']
+    articles = df['article_temp']
 
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+    # Create a TF-IDF vectorizer
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(articles)
 
+    # Train a Naïve Bayes classifier
+    naive_bayes = MultinomialNB()
+    naive_bayes.fit(X, categories)
 
-    # vecotrize
-    vector = TfidfVectorizer(
-        stop_words="english", ngram_range=(1, 2), min_df=3, max_df=1.0, max_features=10000
-    )
+    # Transform the query text into TF-IDF representation
+    query_text_tfidf = vectorizer.transform([query_text])
 
+    # Predict the label probabilities for the new document
+    predicted_probabilities = naive_bayes.predict_proba(query_text_tfidf)[0]
 
-    # fit modal
-    def fit_model(model, model_name):
-        line = Pipeline([("vectorize", vector), (model_name, model)])
+    # Get the predicted label scores
+    categories_scores = dict(zip(naive_bayes.classes_, predicted_probabilities))
 
-        output = cross_validate(
-            line,
-            X_train,
-            y_train,
-            cv=KFold(shuffle=True, n_splits=3, random_state=9),
-            scoring=("accuracy", "f1_weighted", "precision_weighted", "recall_weighted"),
-            return_train_score=True,
-        )
-        return output
+    # Predict the label for the new document
+    predicted_category = naive_bayes.predict(query_text_tfidf)
 
+    #createn a pie chart for UI
+    create_save_chart(naive_bayes, predicted_probabilities);
 
-    dectree = fit_model(DecisionTreeClassifier(), "DTree")
-    ridge = fit_model(RidgeClassifier(), "Ridge")
-    bayes = fit_model(MultinomialNB(), "NB")
-
-    dt = pd.DataFrame.from_dict(dectree)
-    rc = pd.DataFrame.from_dict(ridge)
-    bc = pd.DataFrame.from_dict(bayes)
+    return {
+        "predicted_category": predicted_category[0],
+        "img": chart_path,
+        "predicted_probabilities": predicted_probabilities,
+    }
 
 
-    l1 = [bc, rc, dt]
-    l2 = ["NB", "Ridge", "DT"]
+def create_save_chart(naive_bayes, predicted_probabilities):
+    # Prepare data for pie chart
+    labels = naive_bayes.classes_
+    sizes = predicted_probabilities
+    
+     # Clear previous figure
+    plt.clf()
+    
+    # Plotting the pie chart
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+    plt.axis('equal')  # Equal aspect ratio ensures a circular pie chart
+    plt.title('Predicted Categories Probabilities')
+    #plt.show()
 
-    for each, tag in zip(l1, l2):
-        each["model"] = [tag, tag, tag]
+    # Save the pie chart to a file
+    plt.savefig(chart_path)
 
-    joined_output = pd.concat([bc, rc, dt])
-
-    print(dectree)
-
-    print(ridge)
-
-    print(bayes)
-
-    relevant_measures = list(
-        [
-            "test_accuracy",
-            "test_precision_weighted",
-            "test_recall_weighted",
-            "test_f1_weighted",
-        ]
-    )
-
-    dec_tree_metrics = joined_output.loc[joined_output.model == "DT"][relevant_measures]
-    nb_metrics = joined_output.loc[joined_output.model == "NB"][relevant_measures]
-    r_metrics = joined_output.loc[joined_output.model == "Ridge"][relevant_measures]
-
-    print(dec_tree_metrics)
-
-    print(nb_metrics)
-
-    print(r_metrics)
-
-    metrics_ = [dec_tree_metrics, nb_metrics, r_metrics]
-    names_ = ["Decision Tree", "Naive Bayes", "Ridge Classifier"]
-
-    for scores, namess in zip(metrics_, names_):
-        print(f"{namess} Mean Metrics:")
-        print(scores.mean())
-        print("  ")
-
-    # selection of modal
-
-    # Join training and test datasets
-    X = pd.concat([X_train, X_test])
-    y = pd.concat([y_train, y_test])
-
-
-    def create_and_fit(clf, x, y):
-        best_clf = clf
-        pipeline = Pipeline([("vectorize", vector), ("model", best_clf)])
-        return pipeline.fit(x, y)
-
-
-    # Create model
-    CLASSYfier = create_and_fit(MultinomialNB(), X, y)
-
-    print(CLASSYfier.classes_)
-    CLASSYfier.predict_proba([input_text]);
-    print(CLASSYfier.predict([input_text]))
-    return CLASSYfier.predict([input_text])[0];
+#naive_bayes_classification("More work is needed to understand why the rise is happening, they say. Some of the rise could be attributed to catch-up - from backlogs and delays when health services were shut - but does not explain all of the newly diagnosed cases, say scientists.");

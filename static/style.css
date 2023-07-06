@@ -22,14 +22,19 @@
     margin: 0 auto;
     position: relative;
     /* margin-top: 20vh; */
-    top: 10%;
+    top: 5vh;
 }
 .process_button{
     width: 100%;
 }
 
 .processor_results{
-    margin-top: 20vh;
+    margin-top: 10vh;
+}
+
+.classification_img{
+    margin: 0 auto;
+    text-align: center;
 }
 
 input[type="text"] {

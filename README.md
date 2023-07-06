@@ -20,24 +20,27 @@ beautifulsoup4==4.9.3
 
 ```
 
-## Installation
+## Installation:
 Clone the repository:
 
 ```
 git clone https://github.com/Suraj6E/IRA-search-engine
 ```
-Go to the repository:
+### Go to the repository:
 ```
 cd IRA-search-engine
 ```
-Run the application in developement version:
-```
-python -m index --debug
-```
-Install Folllowing libaries 
+
+###  Install Folllowing libaries 
 
 ```
 pip install requests, bs4, nltk, re, numpy, pandas, matplotlib, flask, subprocess, scikit-learn 
+```
+
+## Running: 
+Run the application in developement version:
+```
+python -m index --debug
 ```
 
 Access the application in your web browser at ```http://localhost:5000```.

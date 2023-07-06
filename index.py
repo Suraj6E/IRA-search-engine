@@ -48,9 +48,11 @@ def run_crawler():
             end_time = time.time()
 
             execution_time = end_time - start_time
+            execution_time_formatted = "{:.2f}".format(execution_time)
+
             
             return jsonify(
-                {"message": "Data successfully scrapped and index updated in "+execution_time+"s"}
+                {"message": "Data successfully scrapped and index updated in "+execution_time_formatted+"s"}
             )
         else:
             return jsonify({"message": "Update time limit not reached."})
@@ -73,8 +75,9 @@ def run_crawler():
         end_time = time.time()
 
         execution_time = end_time - start_time
+        execution_time_formatted = "{:.2f}".format(execution_time)
 
-        return jsonify({"message": "Data successfully scrapped and index updated in "+execution_time+"s"})
+        return jsonify({"message": "Data successfully scrapped and index updated in "+execution_time_formatted+"s"})
 
     return jsonify({"message": "Data is upto date."})
 
@@ -86,7 +89,14 @@ def search():
     per_page = 5  # Number of results to display per page
 
     # Perform search operation with the query
+    start_time = time.time()
     results = get_relevent_score(query)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    execution_time_formatted = "{:.2f}".format(execution_time)
+
+
     total_results = len(results)
     num_pages = (total_results + per_page - 1) // per_page
     start_index = (page - 1) * per_page
@@ -108,6 +118,7 @@ def search():
         next_page=page + 1 if page < num_pages else None,
         page_nums=range(1, num_pages + 1),
         current_page=page,
+        time = execution_time_formatted
     )
 
 
@@ -115,8 +126,15 @@ def search():
 def text_classifier_method():
     if request.method == "POST":
         text = request.form.get("text")
+        
+        start_time = time.time()
         results = naive_bayes_classification(text)
-        return render_template("text_classifier.html", text=text, results=results)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        execution_time_formatted = "{:.2f}".format(execution_time)
+        
+        return render_template("text_classifier.html", text=text, results=results, time = execution_time_formatted)
 
     return render_template("text_classifier.html")
 

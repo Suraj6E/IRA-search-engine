@@ -5,6 +5,9 @@ import pandas as pandas;
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
+import matplotlib.pyplot as plt
+
+
 
 filename = "articles.csv"
 
@@ -51,5 +54,26 @@ def naive_bayes_classification(query_text):
     # Print predicted label
     print("Predicted Label:", predicted_label);
 
+    create_save_chart(naive_bayes, predicted_probabilities);
+
+    return {
+
+    }
+
+
+def create_save_chart(naive_bayes, predicted_probabilities):
+    # Prepare data for pie chart
+    labels = naive_bayes.classes_
+    sizes = predicted_probabilities
+    
+    # Plotting the pie chart
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+    plt.axis('equal')  # Equal aspect ratio ensures a circular pie chart
+    plt.title('Predicted Categories Probabilities')
+    #plt.show()
+
+    # Save the pie chart to a file
+    chart_path = 'static/classification.png'
+    plt.savefig(chart_path)
 
 naive_bayes_classification("More work is needed to understand why the rise is happening, they say. Some of the rise could be attributed to catch-up - from backlogs and delays when health services were shut - but does not explain all of the newly diagnosed cases, say scientists.");

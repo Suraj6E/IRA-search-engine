@@ -1,4 +1,3 @@
-#create indexes 
 import pandas as pandas;
 import json
 from collections import defaultdict

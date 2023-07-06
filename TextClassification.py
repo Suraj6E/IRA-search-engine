@@ -67,6 +67,9 @@ def create_save_chart(naive_bayes, predicted_probabilities):
     labels = naive_bayes.classes_
     sizes = predicted_probabilities
     
+     # Clear previous figure
+    plt.clf()
+    
     # Plotting the pie chart
     plt.pie(sizes, labels=labels, autopct='%1.1f%%')
     plt.axis('equal')  # Equal aspect ratio ensures a circular pie chart

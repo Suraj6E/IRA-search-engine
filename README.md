@@ -44,6 +44,3 @@ python -m index --debug
 ```
 
 Access the application in your web browser at ```http://localhost:5000```.
-
-License
-This project is licensed under the MIT License.

@@ -3,6 +3,7 @@ import subprocess
 import json
 import os
 import ast
+import time
 from datetime import datetime, timedelta
 from QueryProcessing import get_relevent_score
 from TextClassification import naive_bayes_classification
@@ -28,6 +29,15 @@ def run_crawler():
         # Compare the dates
         one_week_ago = datetime.now() - timedelta(weeks=1)
         if json_date < one_week_ago:
+
+            #update scan time at first so that another scan doesn't happen at same time
+            data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(filename, "w") as file:
+                json.dump(data, file)
+
+            #for calculating execution time
+            start_time = time.time()
+
             # run crawler, wait and run data_strucutres for indexing
             crawler = subprocess.Popen(["python", "crawler.py"])
             crawler.wait()
@@ -35,13 +45,12 @@ def run_crawler():
             InvertedIndex = subprocess.Popen(["python", "InvertedIndex.py"])
             InvertedIndex.wait()
 
-            data["last_scan"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            end_time = time.time()
 
-            with open(filename, "w") as file:
-                json.dump(data, file)
-
+            execution_time = end_time - start_time
+            
             return jsonify(
-                {"message": "Data successfully scrapped and index updated. "}
+                {"message": "Data successfully scrapped and index updated in "+execution_time+"s"}
             )
         else:
             return jsonify({"message": "Update time limit not reached."})
@@ -53,6 +62,7 @@ def run_crawler():
         with open(filename, "w") as file:
             json.dump(data, file)
 
+        start_time = time.time()
         # run crawler, wait and run data_strucutres for indexing
         crawler = subprocess.Popen(["python", "crawler.py"])
         crawler.wait()
@@ -60,7 +70,11 @@ def run_crawler():
         InvertedIndex = subprocess.Popen(["python", "InvertedIndex.py"])
         InvertedIndex.wait()
 
-        return jsonify({"message": "Data successfully scrapped and index updated. "})
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+
+        return jsonify({"message": "Data successfully scrapped and index updated in "+execution_time+"s"})
 
     return jsonify({"message": "Data is upto date."})
 
